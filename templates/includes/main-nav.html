@@ -17,21 +17,23 @@
                 Fitness Equipment
             </a>
             <div class="dropdown-menu border-0" aria-labelledby="fitness-link">
-                <a href="" class="dropdown-item">Treadmills</a>
-                <a href="" class="dropdown-item">Exercise Bikes</a>
-                <a href="" class="dropdown-item">Rowing Machines</a>
-                <a href="" class="dropdown-item">Accessories</a>
+                <a href="{% url 'products' %}?category=Treadmills" class="dropdown-item">Treadmills</a>
+                <a href="{% url 'products' %}?category=Exercise Bikes" class="dropdown-item">Exercise Bikes</a>
+                <a href="{% url 'products' %}?category=Rowing Machines" class="dropdown-item">Rowing Machines</a>
+                <a href="{% url 'products' %}?category=Accessories" class="dropdown-item">Accessories</a>
+                <a href="{% url 'products' %}?category=Treadmills,Exercise Bikes,Rowing Machines,Accessories" class="dropdown-item">All Fitness Equipment</a>
             </div>
         </li>
 
         <li class="nav-item dropdown">
             <a class="logo-font font-weight-bold nav-link text-black mr-5" href="#" id="weight-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Weight & Barbells
+                Weights &amp; Barbells
             </a>
             <div class="dropdown-menu border-0" aria-labelledby="weight-link">
-                <a href="" class="dropdown-item">Dumbbells</a>
-                <a href="" class="dropdown-item">Kettlebells</a>
-                <a href="" class="dropdown-item">Barbells & Collars</a>
+                <a href="{% url 'products' %}?category=Dumbbells" class="dropdown-item">Dumbbells</a>
+                <a href="{% url 'products' %}?category=Kettlebells" class="dropdown-item">Kettlebells</a>
+                <a href="{% url 'products' %}?category=Barbells And Collars" class="dropdown-item">Barbells &amp; Collars</a>
+                <a href="{% url 'products' %}?category=Dumbbells,Kettlebells,Barbells And Collars" class="dropdown-item">All Weights &amp; Barbells</a>
             </div>
         </li>
 
@@ -40,9 +42,10 @@
                 Special Offers
             </a>
             <div class="dropdown-menu border-0" aria-labelledby="specials-link">
-                <a href="" class="dropdown-item">New Arrivals</a>
-                <a href="" class="dropdown-item">Best Sellers Offers</a>
-                <a href="" class="dropdown-item">Reduced To Clear</a>
+                <a href="{% url 'products' %}?category=new arrivals" class="dropdown-item">New Arrivals</a>
+                <a href="{% url 'products' %}?category=best sellers_offers" class="dropdown-item">Best Sellers Offers</a>
+                <a href="{% url 'products' %}?category=reduced to clear" class="dropdown-item">Reduced To Clear</a>
+                <a href="{% url 'products' %}?category=new arrivals,best sellers offers,reduced to clear" class="dropdown-item">All Specials</a>
             </div>
         </li>
     </ul>
