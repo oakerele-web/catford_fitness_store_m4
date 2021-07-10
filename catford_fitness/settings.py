@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'bag',
     'checkout',
     'profiles',
+
+    'memberships',
     
     # Other
     'crispy_forms',
@@ -172,6 +174,11 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+if DEBUG:
+    STRIPE_PUBLISHABLE_KEY = 'pk_test_51J5cj4CwK3vFi6sF6YSabRBWbOeaafCjaZOQzJqctddpFPaom4eQ0fNb7hZbkQ0xXnkArhWNZotDLykaeMzil8go00wpAmPXev'
+    STRIPE_SECRET_KEY = 'sk_test_51J5cj4CwK3vFi6sFLtMccnMF10cVWBlN1W0lCyzDgJLkIaaCGISL9W2MJSra6334ZGAvRecsO8yQJfUmim81GafL00TQC9fXYn'
+
 
 
 # Default primary key field type
