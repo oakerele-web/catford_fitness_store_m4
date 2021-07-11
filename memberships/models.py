@@ -10,14 +10,14 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 MEMBERSHIP_CHOICES = (
     ('Standard', 'std'),
     ('Student', 'stu'),
-    ('Free', 'free')
+    ('Premium', 'prem')
 )
 
 class Membership(models.Model):
     slug = models.SlugField()
     memebership_type = models.CharField(
             choices=MEMBERSHIP_CHOICES,
-            default='Free',
+            default='Standard',
             max_length=30)
     price = models.IntegerField(default=15)
     stripe_plan_id = models.CharField(max_length=40)
