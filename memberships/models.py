@@ -9,8 +9,8 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 MEMBERSHIP_CHOICES = (
     ('Standard', 'std'),
-    ('Student', 'stu'),
-    ('Premium', 'prem')
+   # ('Student', 'stu'),
+   # ('Premium', 'prem')
 )
 
 class Membership(models.Model):
