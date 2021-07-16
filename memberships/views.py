@@ -1,351 +1,188 @@
-import stripe
-
-from django.conf import settings
-from django.shortcuts import render, redirect, reverse, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from django.http.response import JsonResponse, HttpResponse
-
-from .models import Membership, StripeCustomer
-
+from django.shortcuts import (
+    render, redirect, reverse, get_object_or_404, HttpResponse
+)
+from django.views.decorators.http import require_POST
 from django.contrib import messages
-from django.contrib.auth.models import User
+from django.conf import settings
+
+from products.models import Product
+from profiles.models import UserProfile
+from profiles.forms import UserProfileForm
+from bag.contexts import bag_contents
+
+import stripe
+import json
 
 
-def memberships(request):
-    """
-    A view to return the memberships page
-    """
+@require_POST
+def cache_payment_data(request):
+    try:
+        pid = request.POST.get('client_secret').split('_secret')[0]
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        stripe.PaymentIntent.modify(pid, metadata={
+            'bag': json.dumps(request.session.get('bag', {})),
+            'save_info': request.POST.get('save_info'),
+            'username': request.user,
+        })
+        return HttpResponse(status=200)
+    except Exception as e:
+        messages.error(request, ('Sorry, your payment cannot be '
+                                 'processed right now. Please try '
+                                 'again later.'))
+        return HttpResponse(content=e, status=400)
 
-    # Get all membership model entries
-    memberships = Membership.objects.all()
-    template = 'memberships/memberships.html'
-    if request.user.is_anonymous:
-        context = {
-            'memberships': memberships,
+
+def payment(request):
+    stripe_public_key = settings.STRIPE_PUBLIC_KEY
+    stripe_secret_key = settings.STRIPE_SECRET_KEY
+
+    if request.method == 'POST':
+        bag = request.session.get('bag', {})
+
+        form_data = {
+            'full_name': request.POST['full_name'],
+            'email': request.POST['email'],
+            'phone_number': request.POST['phone_number'],
+            'country': request.POST['country'],
+            'postcode': request.POST['postcode'],
+            'town_or_city': request.POST['town_or_city'],
+            'street_address1': request.POST['street_address1'],
+            'street_address2': request.POST['street_address2'],
+            'county': request.POST['county'],
         }
-    else:
-        profile = Profile.objects.get(user=request.user)
-        if profile.membership:
-            user_membership = profile.membership.name
-            context = {
-                'user_membership': user_membership,
-                'memberships': memberships,
-            }
+
+        order_form = OrderForm(form_data)
+        if order_form.is_valid():
+            order = order_form.save(commit=False)
+            pid = request.POST.get('client_secret').split('_secret')[0]
+            order.stripe_pid = pid
+            order.original_bag = json.dumps(bag)
+            order.save()
+            for item_id, item_data in bag.items():
+                try:
+                    product = Product.objects.get(id=item_id)
+                    if isinstance(item_data, int):
+                        order_line_item = OrderLineItem(
+                            order=order,
+                            product=product,
+                            quantity=item_data,
+                        )
+                        order_line_item.save()
+                    else:
+                        for size, quantity in item_data['items_by_size'].items():
+                            order_line_item = OrderLineItem(
+                                order=order,
+                                product=product,
+                                quantity=quantity,
+                                product_size=size,
+                            )
+                            order_line_item.save()
+                except Product.DoesNotExist:
+                    messages.error(request, (
+                        "One of the products in your bag wasn't "
+                        "found in our database. "
+                        "Please call us for assistance!")
+                    )
+                    order.delete()
+                    return redirect(reverse('view_bag'))
+
+            # Save the info to the user's profile if all is well
+            request.session['save_info'] = 'save-info' in request.POST
+            return redirect(reverse('checkout_success',
+                                    args=[order.order_number]))
         else:
-            context = {
-                'memberships': memberships,
-            }
-
-    return render(request, template, context)
-
-
-def membership_type(request):
-    """
-    Capture membership type selected by user, store it in
-    session variable and redirect user to the signup page
-    """
-
-    membership_type = request.POST.get('membership_type')
-    request.session['membership'] = membership_type
-    if request.user.is_authenticated:
-        return redirect(reverse('membership_checkout'))
-
-    return redirect(reverse('account_signup'))
-
-
-@login_required
-def membership_checkout(request):
-    """
-    Retrieve user selected membership, display it and
-    benefits, and allow user to change the membership
-    type
-    """
-    # Retrieve data for all memberships
-    all_memberships = Membership.objects.all()
-
-    # Check if user already has a memership and got to this
-    # page by accident, then re-direct to change site
-    profile = Profile.objects.get(user=request.user)
-    if profile.membership:
-        return redirect(reverse('membership_change'))
-    # If user is updating selected membership, the
-    # memberhip_type to the new value
-    if request.GET.get('membership-new'):
-        membership_type = request.GET.get('membership-new')
-        # add membership type to session to retrieve for stripe
-        request.session['membership'] = membership_type
-    # If user logged in after
-    # registering, get membership_type from session
+            messages.error(request, ('There was an error with your form. '
+                                     'Please double check your information.'))
     else:
-        try:
-            # Retrieve user selected membership
-            membership_type = request.session['membership']
-        except KeyError:
-            # If user logged in normally, redirect them
-            # to the profile page
+        bag = request.session.get('bag', {})
+        if not bag:
+            messages.error(request,
+                           "There's nothing in your bag at the moment")
             return redirect(reverse('products'))
 
-    # Retrieve data for selected membership type
-    membership = get_object_or_404(Membership, name=membership_type)
-
-    template = 'memberships/membership_checkout.html'
-    context = {
-        'membership': membership,
-        'all_memberships': all_memberships,
-    }
-
-    return render(request, template, context)
-
-
-@login_required
-def user_membership_view(request):
-    """
-    Displays user's membership view with details
-    """
-    profile = Profile.objects.get(user=request.user)
-
-    if not profile.membership:
-        messages.error(request, "You haven't subscribed to a membership yet. "
-                                " Choose one and join the Prickly fam")
-        return redirect(reverse('memberships'))
-
-    membership = get_object_or_404(Membership, name=profile.membership)
-    context = {
-        'membership': membership,
-    }
-    template = 'memberships/user_membership.html'
-
-    return render(request, template, context)
-
-
-@login_required
-def membership_change(request):
-    """
-    Handles membership change and adding selected memebrship
-    to the session
-    """
-    profile = Profile.objects.get(user=request.user)
-    if not profile.membership:
-        return redirect(reverse('memberships'))
-
-    if not request.POST.get('membership_type'):
-        return redirect(reverse('memberships'))
-
-    all_memberships = Membership.objects.all()
-    membership_type = request.POST.get('membership_type')
-    request.session['membership'] = membership_type
-    membership = get_object_or_404(Membership, name=membership_type)
-    template = 'memberships/membership_checkout.html'
-
-    context = {
-        'change_membership': True,
-        'membership': membership,
-        'all_memberships': all_memberships,
-    }
-    return render(request, template, context)
-
-
-@login_required
-def membership_update(request):
-    """
-    Update user's membership in the stripe system
-    and our database too
-    """
-
-    if not Profile.objects.get(user=request.user).membership:
-        return redirect(reverse('memberships'))
-
-    stripe.api_key = settings.STRIPE_SECRET_KEY
-    # user's chosen membership
-    membership = request.session['membership']
-
-    # Asign correct price keys to the paid memberships
-    if membership == 'Ultimate':
-        price = settings.STRIPE_PRICE_ID_ULTIMATE
-    elif membership == 'Supreme':
-        price = settings.STRIPE_PRICE_ID_SUPREME
-    else:
-        price = settings.STRIPE_PRICE_ID_BASIC
-
-    # Check if the user already exists in stripe system and
-    # our database
-    try:
-        stripe_customer = StripeCustomer.objects.get(user=request.user)
-        subscription = stripe.Subscription.retrieve(
-            stripe_customer.stripeSubscriptionId)
-        # Update existing membership with a new one
-        stripe.Subscription.modify(
-            subscription.id,
-            cancel_at_period_end=False,
-            proration_behavior='create_prorations',
-            items=[{
-                'id': subscription['items']['data'][0].id,
-                'price': price,
-            }]
+        current_bag = bag_contents(request)
+        total = current_bag['grand_total']
+        stripe_total = round(total * 100)
+        stripe.api_key = stripe_secret_key
+        intent = stripe.PaymentIntent.create(
+            amount=stripe_total,
+            currency=settings.STRIPE_CURRENCY,
         )
 
-        # Attach new membership to the user's profile
-        membership_type = get_object_or_404(Membership, name=membership)
-        profile = get_object_or_404(Profile, user=request.user)
-        profile.membership = membership_type
-        profile.save()
-
-        messages.success(request, 'Congrats!! You successfully changed'
-                                  ' your membership to the '
-                                  f'{membership} membership!')
-        # Redirect the user to profiles page
-        return redirect(reverse('profile'))
-
-    # If user doesn't exist, return error
-    except StripeCustomer.DoesNotExist:
-        return messages.error(request, 'User does not exist')
-
-
-"""
-The following code was taken from
-https://testdriven.io/blog/django-stripe-subscriptions/
-and
-https://stripe.com/docs/billing/subscriptions/checkout
-It is used to set up Stripe external checkout form
-to handle subscriptions and was customized
-"""
-
-
-@csrf_exempt
-def stripe_config(request):
-    """
-    Handles AJAX requests coming from stripe_sub.js
-    """
-    if request.method == 'GET':
-        # add public key in a dict that will be retrieved by JS
-        stripe_config = {'publicKey': settings.STRIPE_PUBLIC_KEY}
-        return JsonResponse(stripe_config, safe=False)
-
-
-@csrf_exempt
-def create_checkout_session(request):
-    """
-    Creates the Checkout Session with product details
-    and returns Checkout Session ID to be fetched by
-    frontend
-    """
-    if request.method == 'GET':
-        # define domain URL
-        domain_url = settings.DOMAIN_URL
-        # set stripe API from SECRET KEY variable
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        # get user chosen membership from session
-        membership = request.session['membership']
-        # set stripe product price dependant on above
-        if membership == 'Ultimate':
-            price = settings.STRIPE_PRICE_ID_ULTIMATE
-        elif membership == 'Supreme':
-            price = settings.STRIPE_PRICE_ID_SUPREME
+        # Attempt to prefill the form with any info
+        # the user maintains in their profile
+        if request.user.is_authenticated:
+            try:
+                profile = UserProfile.objects.get(user=request.user)
+                order_form = OrderForm(initial={
+                    'full_name': profile.user.get_full_name(),
+                    'email': profile.user.email,
+                    'phone_number': profile.default_phone_number,
+                    'country': profile.default_country,
+                    'postcode': profile.default_postcode,
+                    'town_or_city': profile.default_town_or_city,
+                    'street_address1': profile.default_street_address1,
+                    'street_address2': profile.default_street_address2,
+                    'county': profile.default_county,
+                })
+            except UserProfile.DoesNotExist:
+                order_form = OrderForm()
         else:
-            price = settings.STRIPE_PRICE_ID_BASIC
+            order_form = OrderForm()
 
-        # Create session that will be passed to stripe
-        # with new membership details
-        try:
-            # Create a Checkout Session
-            checkout_session = stripe.checkout.Session.create(
-                client_reference_id=(request.user.id if
-                                     request.user.is_authenticated else None),
-                # link to checkout success page if paymenr successful
-                success_url=(
-                    domain_url + 'success?session_id={CHECKOUT_SESSION_ID}'),
-                #  Link to a page if user cancels the payment in checkout
-                cancel_url=domain_url + 'membership_checkout/',
-                # Define payment method to be a card
-                payment_method_types=['card'],
-                # Subscription model
-                mode='subscription',
-                # Price and quantity of items
-                line_items=[
-                    {
-                        'price': price,
-                        'quantity': 1,
-                    }
-                ]
-            )
-            # Return Checkout Session ID
-            return JsonResponse({'sessionId': checkout_session['id']})
-        except Exception as e:
-            return JsonResponse({'error': str(e)})
+    if not stripe_public_key:
+        messages.warning(request, ('Stripe public key is missing. '
+                                   'Did you forget to set it in '
+                                   'your environment?'))
+
+    template = 'payment/payment.html'
+    context = {
+        'order_form': order_form,
+        'stripe_public_key': stripe_public_key,
+        'client_secret': intent.client_secret,
+    }
+
+    return render(request, template, context)
 
 
-@login_required
-def success(request):
+def payment_success(request, order_number):
     """
-    Display profile page and the membership details
-    when a user has succesfully subscribed
+    Handle successful checkouts
     """
-    profile = get_object_or_404(Profile, user=request.user)
-    if not profile.membership:
-        membership_type_value = request.session['membership']
-        membership_type = Membership.objects.get(name=membership_type_value)
-        profile.membership = membership_type
-        profile.save()
+    save_info = request.session.get('save_info')
+    order = get_object_or_404(Order, order_number=order_number)
 
-    membership = get_object_or_404(Profile, user=request.user).membership.name
+    if request.user.is_authenticated:
+        profile = UserProfile.objects.get(user=request.user)
+        # Attach the user's profile to the order
+        order.user_profile = profile
+        order.save()
 
-    # Add a success message
-    messages.success(request, 'Congrats!! You successfully'
-                              ' subscribed to the '
-                              f'{membership} membership!')
-    # Redirect the user to profiles page
-    return redirect(reverse('profile'))
+        # Save the user's info
+        if save_info:
+            profile_data = {
+                'default_phone_number': order.phone_number,
+                'default_country': order.country,
+                'default_postcode': order.postcode,
+                'default_town_or_city': order.town_or_city,
+                'default_street_address1': order.street_address1,
+                'default_street_address2': order.street_address2,
+                'default_county': order.county,
+            }
+            user_profile_form = UserProfileForm(profile_data, instance=profile)
+            if user_profile_form.is_valid():
+                user_profile_form.save()
 
+    messages.success(request, f'Order successfully processed! \
+        Your order number is {order_number}. A confirmation \
+        email will be sent to {order.email}.')
 
-@csrf_exempt
-def stripe_webhook(request):
-    """
-    Create a new StripeCustomer every time someone subscribes
-    to the membership by using Stripe Webhook
-    """
-    stripe.api_key = settings.STRIPE_SECRET_KEY
-    endpoint_secret = settings.STRIPE_WH_SECRET_SUB
-    payload = request.body
-    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
-    event = None
+    if 'bag' in request.session:
+        del request.session['bag']
 
-    try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, endpoint_secret
-        )
-    except ValueError as e:
-        # Return status 400 if payload is invalid
-        messages.error(request, f'error: {e}')
-        return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError as e:
-        # Return status 400 if signature is invalid
-        messages.error(request, f'error: {e}')
-        return HttpResponse(status=400)
+    template = 'payment/payment_success.html'
+    context = {
+        'order': order,
+    }
 
-    # Handle the checkout.session.completed event
-    if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-
-        # Fetch all the required data from session
-        client_reference_id = session.get('client_reference_id')
-        stripe_customer_id = session.get('customer')
-        stripe_subscription_id = session.get('subscription')
-        # get total of the product subscribtion
-        total = session.get('amount_total')
-        total_num = round(total / 100, 2)
-        # get membership type based on the price
-        membership_type = get_object_or_404(Membership, price=total_num)
-        # Get the user and create a new StripeCustomer
-        user = User.objects.get(id=client_reference_id)
-        StripeCustomer.objects.create(
-            user=user,
-            stripeCustomerId=stripe_customer_id,
-            stripeSubscriptionId=stripe_subscription_id,
-        )
-        # Update user profile with the membership details
-        profile = get_object_or_404(Profile, user=user)
-        profile.membership = membership_type
-        profile.save()
-
-    return HttpResponse(status=200)
+    return render(request, template, context)
