@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     'checkout',
     'profiles',
     'gym',
-
     'memberships',
     
     # Other
@@ -208,9 +207,6 @@ if 'USE_AWS' in os.environ:
     STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIAFILES_LOCATION}/'
 
-if DEBUG:
-    STRIPE_PUBLISHABLE_KEY = 'pk_test_51J5cj4CwK3vFi6sF6YSabRBWbOeaafCjaZOQzJqctddpFPaom4eQ0fNb7hZbkQ0xXnkArhWNZotDLykaeMzil8go00wpAmPXev'
-    STRIPE_SECRET_KEY = 'sk_test_51J5cj4CwK3vFi6sFLtMccnMF10cVWBlN1W0lCyzDgJLkIaaCGISL9W2MJSra6334ZGAvRecsO8yQJfUmim81GafL00TQC9fXYn'
 
 
 

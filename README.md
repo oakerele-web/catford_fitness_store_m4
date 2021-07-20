@@ -1,59 +1,108 @@
-![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
+<img src="media/homepage.png" style="margin: 0; width: 80%;">
 
-Welcome oakerele-web,
+# Catford Fitness Store
 
-This is the Code Institute student template for Gitpod. We have preinstalled all of the tools you need to get started. You can safely delete this README.md file, or change it for your own project. Please do read it at least once, though! It contains some important information about Gitpod and the extensions we use.
+## Milestone Project 4
 
-## Gitpod Reminders
+- This project aims to build a full-stack web application using Django full-stack web framework, HTML, CSS3 and Javascript.
 
-To run a frontend (HTML, CSS, Javascript only) application in Gitpod, in the terminal, type:
+  - I have built an e-commerce web application for a fitness store that sells fitness equipment to individuals/companies and in the process of adding a gym of their own that will be ran on membership subscription basis.
+  
+  - My application features e-commerce functionality, payments using stripe, a blog section, user login, confirmation emails, CRUD functionality for admin to add blog posts and stock items, and an admin section, for the admin user to access database records.
 
-`python3 -m http.server`
+  - For the assessor, I have included the admin login details in the comments section when submitting the project.
 
-A blue button should appear to click: _Make Public_,
+  - This website is for educational purposes and the stripe functionality is set up to accept the test card details please don't enter your personal card details. 
+  
+     - To use the stripe function use the following details.
 
-Another blue button should appear to click: _Open Browser_.
+        - card number : 4242 4242 4242 4242
+        - Any future date
+        - Any five figures.
 
-To run a backend Python file, type `python3 app.py`, if your Python file is named `app.py` of course.
 
-A blue button should appear to click: _Make Public_,
+## Live project
 
-Another blue button should appear to click: _Open Browser_.
 
-In Gitpod you have superuser security privileges by default. Therefore you do not need to use the `sudo` (superuser do) command in the bash terminal in any of the lessons.
+- [View the live project here.](https://oakerele-catford-fitness.herokuapp.com)
 
-To log into the Heroku toolbelt CLI:
 
-1. Log in to your Heroku account and go to *Account Settings* in the menu under your avatar.
-2. Scroll down to the *API Key* and click *Reveal*
-3. Copy the key
-4. In Gitpod, from the terminal, run `heroku_config`
-5. Paste in your API key when asked
 
-You can now use the `heroku` CLI program - try running `heroku apps` to confirm it works. This API key is unique and private to you so do not share it. If you accidently make it public then you can create a new one with _Regenerate API Key_.
+## Table of Contents.
 
-## Updates Since The Instructional Video
+- [User experience](#user-experience)
+  * [User Stories](#user-stories)
+  * [WireFrames](#wireframes)
+  * [Database models and schema](#database-models-and-schema)
+    + [Models](#models)
+  * [Design](#design)
+    + [Colour scheme](#colour-scheme)
+    + [Typography](#typography)
+    + [Images](#images)
+    + [Icons](#icons)
+- [Features](#features)
+    + [Homepage App.](#homepage-app)
+    + [Stock App](#stock-app)
+    + [Cart App.](#cart-app)
+    + [Checkout app.](#checkout-app)
+    + [Reviews app.](#reviews-app)
+    + [Users app.](#users-app)
+    + [Wishlist app.](#wishlist-app)
+    + [Blog app.](#blog-app)
+- [Testing](#testing)
+    + [Testing.](#testing)
+- [Technologies used.](#technologies-used)
+  * [Languages Used.](#languages-used)
+  * [Django, and Django extensions used](#django--and-django-extensions-used)
+  * [Frameworks Libraries and Programs.](#frameworks-libraries-and-programs)
+  * [Deployment.](#deployment)
+    + [Github, Gitpod, Git, Heroku, and Amazon AWS.](#github--gitpod--git--heroku--and-amazon-aws)
+    + [Project setup.](#project-setup)
+    + [Deployment to Heroku](#deployment-to-heroku)
+    + [Amazon AWS](#amazon-aws)
+    + [Setting up locally](#setting-up-locally)
+- [Credits.](#credits)
+  * [Code.](#code)
+    + [Kevin Powell Youtube video.](#kevin-powell-youtube-video)
+    + [The WebShala Thumbnail slider](#the-webshala-thumbnail-slider)
+    + [Stack Overflow](#stack-overflow)
+  * [Content](#content)
+  * [Media](#media)
+  * [Acknowledgements](#acknowledgements)
 
-We continually tweak and adjust this template to help give you the best experience. Here is the version history:
 
-**May 10 2021:** Added `heroku_config` script to allow Heroku API key to be stored as an environment variable.
+## User experience
 
-**April 7 2021:** Upgraded the template for VS Code instead of Theia.
+### User Stories
 
-**October 21 2020:** Versions of the HTMLHint, Prettier, Bootstrap4 CDN and Auto Close extensions updated. The Python extension needs to stay the same version for now.
+- Customers
+  - Website experience
+    - As a customer, I would like to see what the website is selling.
+    - As a customer, I would like to be able to navigate the website easily.
+    - As a customer, I would like to see some information about the company.
+    - As a customer, I would like to be able to contact the company.
+  
+  - Searching for items.
+    - As a customer, I would like to see all the products the company sells.
+    - As a customer, I would like to be able to search by category.
+    - As a customer, I would like to be able to search through the items.
+    - As a customer, I would like to sort the items by price.
 
-**October 08 2020:** Additional large Gitpod files (`core.mongo*` and `core.python*`) are now hidden in the Explorer, and have been added to the `.gitignore` by default.
+  - Shopping.
+    - As a customer, I would like to see the product price and description.
+    - As a customer, I would like to be able to add products to my shopping cart.
+    - As a customer, I would like to be notified when I complete interactions with the site.
+    - As a customer, I would like to be able to edit my shopping cart.
+    - As a customer, I would like to be able to checkout easily.
+    - As a customer, I would like to receive confirmation of my order.
 
-**September 22 2020:** Gitpod occasionally creates large `core.Microsoft` files. These are now hidden in the Explorer. A `.gitignore` file has been created to make sure these files will not be committed, along with other common files.
+  - Account.
+    - As a customer, I would like to save my details to an account.
+    - As a customer, I would like to see my previous order details.
+    - As a customer, I would like to leave a review of the company.
 
-**April 16 2020:** The template now automatically installs MySQL instead of relying on the Gitpod MySQL image. The message about a Python linter not being installed has been dealt with, and the set-up files are now hidden in the Gitpod file explorer.
-
-**April 13 2020:** Added the _Prettier_ code beautifier extension instead of the code formatter built-in to Gitpod.
-
-**February 2020:** The initialisation files now _do not_ auto-delete. They will remain in your project. You can safely ignore them. They just make sure that your workspace is configured correctly each time you open it. It will also prevent the Gitpod configuration popup from appearing.
-
-**December 2019:** Added Eventyret's Bootstrap 4 extension. Type `!bscdn` in a HTML file to add the Bootstrap boilerplate. Check out the <a href="https://github.com/Eventyret/vscode-bcdn" target="_blank">README.md file at the official repo</a> for more options.
-
----
-
-Happy coding!
+- Website owner.
+  - As the business owner, I would like to be able to edit and add products easily.
+  - As the business owner, I would like to be able to delete products.
+  - As the business owner, I would like to have access to an admin section. 
+  - As the business owner, I would like my customers to be able to shop on the site easily.
