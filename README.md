@@ -85,8 +85,8 @@
   - Searching for items.
     - As a customer, I would like to see all the products the company sells.
     - As a customer, I would like to be able to search by category.
-    - As a customer, I would like to be able to search through the items.
     - As a customer, I would like to sort the items by price.
+    - As a customer, I would like to sort the items by rating.
 
   - Shopping.
     - As a customer, I would like to see the product price and description.
