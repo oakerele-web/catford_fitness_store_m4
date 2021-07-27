@@ -230,5 +230,31 @@ Every page is designed to show the navbar displaying the name of this e-commerce
 
 ## Home Page
 
-The Home page is an introductory page for the store. It contains the navbar and only four pages<br> viz: Home, All Words, Log In and Register. The main page contains an introduction to what the dictionary is<br> all about. It defines Jargon and the types of users which have been broken into Type 1 and Type 2.<br>
+The Home page is an introductory page for the store. It contains the navbar and only four pages viz:<br>
+* All Products - This has a drop down button that contains the ability for the users to be able to <br> sort: By Price; By Rating and By Category<br>  
+* Fitness Equipment - This is the category for all our fitness equipment with a drop down that shows <br> Treadmills, Exercise Bikes, Rowing Machines, Accessories and All Fitness Equipment (all the products <br> in that category).<br>
+* Weights and Barbells - This category contains Dumbbells, Kettlebells, Barbells & Collars and All <br>
+Weights & Barbells (all the products in that category).<br>
+* Special Offers - This category contain promotions that will attract increase in sales as it sets out<br> New Arrivals, Best Seller Offers, Reduced to clear and All Specials (all the products in that category).<br>
+
+## Product Page
+
+ - Product Detail Page displays product image, title, description, quantity selector, price, 'put in the cart' button, and Reviews section at the bottom of the page.
+    - When the user clicks +/- buttons for quantity, the quantity increases or decreases, and the price updates to reflect that.
+    - the - button and + button are disabled (function and style) if the user has entered 1 or 10 to indicate that they cannot add more/less.
+    - Typing has been disabled to prevent as much as possible for the user to 'accidentally' select more or less than the allowed quantity.
+    - Arrow buttons are still available but allow the user to only enter 1-10 by using form validation.
+    - If the user overrides the front-end validation (deleting HTML max and min attributes in Google Develop Tools for example) and enters a value that's >10 or <0, an error message is displayed and quantity not added.
+    - When the user has selected a valid quantity and the 'Add to cart' button is clicked, an item is added to the cart and a cart notification is displayed with all items in the cart and the page is refreshed.
+    - Reviews section shows all reviews (if any), the overall average product rating, and a Review button.
+    - Review button is only displayed to logged-in users. This was tested by looking at pages while logged in and also when not.
+    - When the Review button is clicked, a modal is opened as an overlay on the page with a review form. All fields are required and the form will not submit otherwise.
+    - When 'x' or 'cancel' are clicked, the module is closed without saving.
+    - When the form is filled out and the user clicks 'Add', the review is saved to the database, modal is closed and a success notification tells the user that the review was successfully added.
+    - Overall rating is updated to include the new rating, and the review is displayed automatically.
+    - User can only add 1 review per item
+    - User can see 'edit' and 'delete' buttons under their reviews.
+    - When the 'Edit' button is clicked, the modal opens with review's details prefilled. When 'x' and 'cancel' are clicked, the modal closes, and the review is not updated. If 'Edit' is clicked, the review is updated, modal closed, and a message is displayed to let the user know.
+    - If the 'delete' button is clicked, a modal appears asking the user to confirm if they want to delete the review. If 'x' or cancel are clicked, the modal is closed and the review is not deleted. If 'delete' is clicked, the review is deleted and a message is displayed confirming it to the user.
+
 
