@@ -1,4 +1,4 @@
-<img src="media/images/mockup.png" style="margin: 0; width: 80%;">
+<img src="media/images/home mockup.png" style="margin: 0; width: 80%;">
 
 # Catford Fitness Store
 
