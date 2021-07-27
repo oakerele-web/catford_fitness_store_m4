@@ -1,4 +1,4 @@
-<img src="media/homepage.png" style="margin: 0; width: 80%;">
+<img src="media/images/mockup.png" style="margin: 0; width: 80%;">
 
 # Catford Fitness Store
 
@@ -6,9 +6,9 @@
 
 - This project aims to build a full-stack web application using Django full-stack web framework, HTML, CSS3 and Javascript.
 
-  - I have built an e-commerce web application for a fitness store that sells fitness equipment to individuals/companies and in the process of adding a gym of their own that will be ran on membership subscription basis.
+  - I have built an e-commerce web application for a fitness store that sells fitness equipment to individuals/companies.
   
-  - My application features e-commerce functionality, payments using stripe, a blog section, user login, confirmation emails, CRUD functionality for admin to add blog posts and stock items, and an admin section, for the admin user to access database records.
+  - My application features e-commerce functionality, payments using stripe, user login, confirmation emails, CRUD functionality for admin to add stock items, and an admin section, for the admin user to access database records.
 
   - For the assessor, I have included the admin login details in the comments section when submitting the project.
 
@@ -30,25 +30,18 @@
 
 ## Table of Contents.
 
-- [User experience](#user-experience)
-  * [User Stories](#user-stories)
-  * [WireFrames](#wireframes)
-  * [Database models and schema](#database-models-and-schema)
-    + [Models](#models)
-  * [Design](#design)
-    + [Colour scheme](#colour-scheme)
-    + [Typography](#typography)
-    + [Images](#images)
-    + [Icons](#icons)
-- [Features](#features)
+1. [User Experience](#user-Experience)
+    - [Project Goal](#project-goal)
+    - [User Stories](#user-stories)
+    - [Developer Goal](developer-goal)
+    - [Design Choices](#design-choices)
+2. [Wireframes And Mockups](#wireframes-and-mockups)
+3. [Features](#features)
     + [Homepage App.](#homepage-app)
-    + [Stock App](#stock-app)
-    + [Cart App.](#cart-app)
+    + [Products App](#products-app)
+    + [Bag App.](#bag-app)
     + [Checkout app.](#checkout-app)
-    + [Reviews app.](#reviews-app)
-    + [Users app.](#users-app)
-    + [Wishlist app.](#wishlist-app)
-    + [Blog app.](#blog-app)
+    + [Profiles app.](#profiles-app)
 - [Testing](#testing)
     + [Testing.](#testing)
 - [Technologies used.](#technologies-used)
@@ -72,6 +65,11 @@
 
 
 ## User experience
+
+### Project Goal
+The main goal of this project is to implement some ***e-commerce store*** where customers can log in online, <br>
+search for products of interest to them, select them and be able to securely check out and make payment online <br>
+for the products purchased.
 
 ### User Stories
 
@@ -101,8 +99,136 @@
     - As a customer, I would like to see my previous order details.
     - As a customer, I would like to leave a review of the company.
 
-- Website owner.
+### Developer Goal
+
   - As the business owner, I would like to be able to edit and add products easily.
   - As the business owner, I would like to be able to delete products.
   - As the business owner, I would like to have access to an admin section. 
   - As the business owner, I would like my customers to be able to shop on the site easily.
+
+
+## Design Choices
+Bearing in mind the three main purposes of design i.e. communication, aesthetics and functionality, <br>
+I choose to use black, grey and light grey with white background to build a beautiful and attractive <br>user interface. Blue for update, red for delete and warnings and black color for the buttons.<br>
+
+# Wireframes And Mockups 
+* Sketching
+* Drawings
+* Features
+* Design with Balsamiq
+
+- ### Wireframes & Sketches
+    - <details>
+        <summary>Home</summary>
+        <img src="./media/images/HomeSketch.png"/>
+        <img src="./media/images/Home Wireframe.png"/>
+    </details>
+
+    - <details>
+        <summary>Home Mobile</summary>
+        <img src="./media/images/Home Mobile Sketch.png"/>
+        <img src="./media/images/Home Mobile Wireframe.png"/>
+    </details>
+
+    - <details>
+        <summary>Product Page</summary>
+        <img src="./media/images/Product Page Sketch.png"/>
+        <img src="./media/images/Product Page Wireframe.png"/>
+    </details>
+
+    - <details>
+        <summary>Product Management</summary>
+        <img src="./media/images/Product Management Sketch.png"/>
+        <img src="./media/images/Product Management Wireframe.png"/>
+    </details>
+
+    - <details>
+        <summary>Shopping Bag</summary>
+        <img src="./media/images/Shopping Bag Sketch.png"/>
+        <img src="./media/images/Shopping Bag Wireframe.png"/>
+    </details>
+
+    - <details>
+        <summary>Checkout</summary>
+        <img src="./media/images/Checkout Sketch.png"/>
+        <img src="./media/images/Checkout Wireframe.png"/>
+    </details>
+
+    - <details>
+        <summary>Sign Up</summary>
+        <img src="./media/images/Signup Sketch.png"/>
+        <img src="./media/images/Signup Wireframe.png"/>
+    </details>
+
+    - <details>
+        <summary>Sign In</summary>
+        <img src="./media/images/Signin Sketch.png"/>
+        <img src="./media/images/Signin Wireframe.png"/>
+    </details>
+
+    - <details>
+        <summary>My Profile</summary>
+        <img src="./media/images/My Profile Sketch.png"/>
+        <img src="./media/images/My Profile Wireframe.png"/>
+    </details>
+
+- ### Mockups
+    - <details>
+        <summary>Home</summary>
+        <img src="./media/images/home mockup.png"/>
+    </details>
+
+    - <details>
+        <summary>All Products</summary>
+        <img src="./media/images/all products mockup.png"/>
+    </details>
+
+    - <details>
+        <summary>Product</summary>
+        <img src="./media/images/product mockup.png"/>
+    </details>
+
+    - <details>
+        <summary>Product Management</summary>
+        <img src="./media/images/product management mockup.png"/>
+    </details>
+    
+    - <details>
+        <summary>Shopping Bag</summary>
+        <img src="./media/images/shopping bag mockup.png"/>
+    </details>
+
+    - <details>
+        <summary>Checkout</summary>
+        <img src="./media/images/checkout mockup.png"/>
+    </details>
+
+    - <details>
+        <summary>Sign Up</summary>
+        <img src="./media/images/signup mockup.png"/>
+    </details>
+
+    - <details>
+        <summary>Sign In</summary>
+        <img src="./media/images/signin mockup.png"/>
+    </details>
+
+    - <details>
+        <summary>My Profile</summary>
+        <img src="./media/images/my profile mockup.png"/>
+    </details>
+
+# Existing Features
+There are 8 key pages on this website:
++ [Homepage App.](#homepage-app)
++ [Products App](#products-app)
++ [Bag App.](#bag-app)
++ [Checkout app.](#checkout-app)
++ [Profiles app.](#profiles-app)
+
+Every page is designed to show the navbar displaying the name of this e-commerce store and the <br> categories of available products that are sold by the store. The mobile phone is designed to display <br> the pages in a collapsible manner because of the number of pages to be displayed, the minimum of which <br> is four and maximum of six and some pages have lengthy name. In the middle are the sections that display <br> the message/information for the page. While at the bottom is the footer which is designed to take users<br> direct to the products that are sold by the store. The navbar was designed with Bootstrap.
+
+## Home Page
+
+The Home page is an introductory page for the store. It contains the navbar and only four pages<br> viz: Home, All Words, Log In and Register. The main page contains an introduction to what the dictionary is<br> all about. It defines Jargon and the types of users which have been broken into Type 1 and Type 2.<br>
+
